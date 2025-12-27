@@ -21,37 +21,35 @@
   html, body {
     height: 100%;
     margin: 0;
-    background-color: #000;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     color: var(--text-main);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Fixed Background */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: url("https://i.imgur.com/Q2YBbzw.png") center/cover no-repeat;
-    z-index: -2;
-    pointer-events: none;
+  /* ---------------------------- */
+  /* FIXED BACKGROUND             */
+  /* ---------------------------- */
+  body {
+    /* Image applied directly to body */
+    background: url("https://i.imgur.com/Q2YBbzw.png") no-repeat center center fixed;
+    background-size: cover;
   }
   
-  /* Dark overlay for readability */
+  /* The dark tint overlay so text is readable */
   body::after {
     content: "";
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.85) 100%);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    background: radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
+    backdrop-filter: blur(20px) saturate(120%);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
     z-index: -1;
     pointer-events: none;
   }
 
   /* ---------------------------- */
-  /* GLASSY HEADER        */
+  /* GLASSY HEADER                */
   /* ---------------------------- */
   header {
     position: fixed;
@@ -63,7 +61,6 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* Gradient fade down */
     background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
   }
 
@@ -77,7 +74,6 @@
   
   .logo span { color: var(--accent); }
 
-  /* Apple TV Style Search Bar */
   .search-wrap {
     position: relative;
     width: 300px;
@@ -100,7 +96,7 @@
   .search:focus {
     background: rgba(255, 255, 255, 0.15);
     border-color: var(--accent);
-    width: 360px; /* Expands on focus */
+    width: 360px;
     box-shadow: 0 0 20px rgba(10, 132, 255, 0.3);
   }
 
@@ -114,7 +110,7 @@
   }
 
   /* ---------------------------- */
-  /* LAYOUT           */
+  /* LAYOUT                       */
   /* ---------------------------- */
   main {
     padding-top: 100px;
@@ -124,7 +120,7 @@
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Align left logic like Apple TV */
+    align-items: flex-start;
   }
 
   .section {
@@ -142,7 +138,6 @@
     text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   }
 
-  /* Grid Logic */
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -151,7 +146,7 @@
   }
 
   /* ---------------------------- */
-  /* FEATURED (HERO)       */
+  /* HERO / CARDS                 */
   /* ---------------------------- */
   .featured {
     width: 100%;
@@ -174,7 +169,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: filter 0.4s ease;
   }
 
   .featured-overlay {
@@ -228,9 +222,6 @@
     box-shadow: 0 0 30px rgba(255,255,255,0.3);
   }
 
-  /* ---------------------------- */
-  /* GLASS CARDS          */
-  /* ---------------------------- */
   .card {
     position: relative;
     border-radius: 16px;
@@ -241,7 +232,6 @@
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
-  /* The image */
   .thumb-wrap {
     width: 100%;
     aspect-ratio: 16/9;
@@ -256,7 +246,6 @@
     filter: brightness(0.9);
   }
 
-  /* Card Meta Data */
   .card-meta {
     position: absolute;
     bottom: 0;
@@ -266,7 +255,7 @@
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
-    transform: translateY(100%); /* Hidden by default */
+    transform: translateY(100%);
     transition: transform 0.3s ease;
     border-top: 1px solid rgba(255,255,255,0.1);
   }
@@ -280,12 +269,11 @@
     text-overflow: ellipsis;
   }
 
-  /* Hover States - Apple TV Focus Effect */
   .card:hover {
     transform: scale(1.05);
     z-index: 10;
     box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-    border: 1px solid rgba(255,255,255,0.5); /* White glow border */
+    border: 1px solid rgba(255,255,255,0.5);
   }
   
   .card:hover .thumb {
@@ -294,11 +282,11 @@
   }
   
   .card:hover .card-meta {
-    transform: translateY(0); /* Slide up title */
+    transform: translateY(0);
   }
 
   /* ---------------------------- */
-  /* CUSTOM VIDEO PLAYER     */
+  /* PLAYER OVERLAY               */
   /* ---------------------------- */
   #overlay {
     position: fixed;
@@ -316,7 +304,6 @@
     opacity: 1;
   }
 
-  /* Wrapper to handle fullscreen API */
   .video-wrapper {
     width: 100%;
     height: 100%;
@@ -327,14 +314,17 @@
     justify-content: center;
   }
 
-  video {
+  /* Both players fill the screen */
+  video, iframe {
     width: 100%;
     height: 100%;
-    max-height: 100vh;
+    border: none;
     outline: none;
+    position: absolute;
+    top: 0;
+    left: 0;
   }
 
-  /* Loading Spinner */
   .loader {
     position: absolute;
     top: 50%;
@@ -351,7 +341,7 @@
   }
   @keyframes spin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
-  /* Controls Container (Glass) */
+  /* Custom Controls */
   .controls {
     position: absolute;
     bottom: 30px;
@@ -372,13 +362,13 @@
     z-index: 20;
   }
 
-  .video-wrapper:hover .controls,
-  .video-wrapper.paused .controls {
+  /* Only show controls if using Custom Player */
+  .video-wrapper.custom-mode:hover .controls,
+  .video-wrapper.custom-mode.paused .controls {
     opacity: 1;
     transform: translateY(0);
   }
 
-  /* Timeline */
   .timeline-wrap {
     display: flex;
     align-items: center;
@@ -398,7 +388,6 @@
     position: relative;
   }
   
-  /* Range Slider Thumb */
   input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     height: 16px;
@@ -408,13 +397,7 @@
     box-shadow: 0 0 10px rgba(0,0,0,0.5);
     margin-top: 0;
   }
-  
-  /* Progress fill trick */
-  input[type="range"]::-webkit-slider-runnable-track {
-    color: var(--accent); /* Used by JS to fill */
-  }
 
-  /* Buttons Row */
   .controls-main {
     display: flex;
     align-items: center;
@@ -440,19 +423,9 @@
     justify-content: center;
   }
   
-  .ctrl-btn:hover {
-    background: rgba(255,255,255,0.1);
-  }
-
-  .ctrl-btn svg {
-    width: 24px;
-    height: 24px;
-    fill: currentColor;
-  }
-
-  .volume-slider {
-    width: 80px;
-  }
+  .ctrl-btn:hover { background: rgba(255,255,255,0.1); }
+  .ctrl-btn svg { width: 24px; height: 24px; fill: currentColor; }
+  .volume-slider { width: 80px; }
 
   .select-box {
     background: rgba(255,255,255,0.1);
@@ -464,11 +437,8 @@
     cursor: pointer;
     outline: none;
   }
-  .select-box option {
-    background: #222;
-  }
+  .select-box option { background: #222; }
 
-  /* Top Right Close Button */
   .close-btn {
     position: absolute;
     top: 30px;
@@ -501,7 +471,7 @@
 
   @media (max-width: 768px) {
     header { padding: 15px 20px; }
-    .search-wrap { display: none; } /* Hide search on mobile for clean look */
+    .search-wrap { display: none; }
     .section { padding: 20px; }
     .controls { bottom: 10px; left: 10px; right: 10px; padding: 10px; }
     .featured-title { font-size: 28px; }
@@ -532,8 +502,10 @@
     <div class="close-btn" id="exitBtn">✕</div>
     
     <video id="player" playsinline crossorigin="anonymous"></video>
+
+    <iframe id="iframePlayer" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" style="display:none;"></iframe>
     
-    <div class="controls">
+    <div class="controls" id="customControls">
       <div class="timeline-wrap">
         <span id="currentTime">0:00</span>
         <input type="range" id="seekSlider" min="0" max="100" value="0" step="0.1">
@@ -572,9 +544,6 @@
 </div>
 
 <script>
-/* ----------------------------------------------------
-   DATA: LINKS PRESERVED 
-   ---------------------------------------------------- */
 const movies = [
   { title: "[S2/E4] Its A Deal", cover: "https://i.imgur.com/AOk6KKM.png", video: "https://drive.google.com/file/d/1GSRutDwFwKQrxQLI8o9C1yRyGgz2HRqO/preview", isMusic: false, isFeatured: false },
   { title: "[S2/E5] Silenced | SO FAR", cover: "https://i.imgur.com/tWPq9Bh.png", video: "https://drive.google.com/file/d/1CKGgmZsT4UDFuxo7MaL6QrCn8rKAPm1L/preview", isMusic: false, isFeatured: true },
@@ -623,7 +592,6 @@ function createGrid(items) {
     return g;
 }
 
-// Build Featured
 const featItem = movies.find(m => m.isFeatured) || movies[0];
 const featDiv = document.createElement('div');
 featDiv.className = 'featured';
@@ -641,25 +609,23 @@ main.appendChild(createSection('Featured', featDiv));
 main.appendChild(createSection('Episodes', createGrid(movies.filter(m => !m.isMusic))));
 main.appendChild(createSection('Songs', createGrid(movies.filter(m => m.isMusic))));
 
-/* ----------------------------------------------------
-   SEARCH LOGIC
-   ---------------------------------------------------- */
 document.getElementById('searchInput').addEventListener('input', (e) => {
     const val = e.target.value.toLowerCase();
-    const cards = document.querySelectorAll('.card');
-    cards.forEach(card => {
+    document.querySelectorAll('.card').forEach(card => {
         const txt = card.querySelector('.card-title').textContent.toLowerCase();
         card.style.display = txt.includes(val) ? '' : 'none';
     });
 });
 
 /* ----------------------------------------------------
-   PLAYER LOGIC (Google Drive Fix)
+   HYBRID PLAYER LOGIC
    ---------------------------------------------------- */
 const overlay = document.getElementById('overlay');
 const video = document.getElementById('player');
+const iframe = document.getElementById('iframePlayer');
 const loader = document.getElementById('loader');
 const container = document.getElementById('videoContainer');
+const customControls = document.getElementById('customControls');
 
 // Controls
 const playPauseBtn = document.getElementById('playPauseBtn');
@@ -669,46 +635,70 @@ const seekSlider = document.getElementById('seekSlider');
 const currentTimeEl = document.getElementById('currentTime');
 const durationEl = document.getElementById('duration');
 const volumeSlider = document.getElementById('volumeSlider');
-const muteBtn = document.getElementById('muteBtn');
-const fsBtn = document.getElementById('fsBtn');
 const speedSelect = document.getElementById('speedSelect');
+const fsBtn = document.getElementById('fsBtn');
 
-// Helper: Convert Google Drive /preview link to Direct Stream URL
-function getDirectLink(url) {
-    // Extract ID
-    const match = url.match(/\/d\/(.+?)\//);
-    if (match && match[1]) {
-        // Return export=download link which works in <video> tags
-        return `https://drive.google.com/uc?export=download&id=${match[1]}`;
-    }
-    return url;
-}
+let currentVideoLink = "";
 
+// 1. Try to load Custom Player
 function loadVideo(item) {
     if(!item.video) return;
+    currentVideoLink = item.video;
     
-    // Reset state
     overlay.classList.add('active');
     loader.style.display = 'block';
-    video.style.display = 'none';
     
-    // Set direct source
-    const directUrl = getDirectLink(item.video);
-    video.src = directUrl;
+    // Attempt Direct Stream
+    container.classList.add('custom-mode');
+    iframe.style.display = 'none';
+    video.style.display = 'block';
+    customControls.style.display = 'flex';
     
-    video.load();
-    video.play().catch(e => console.log("Auto-play prevented", e));
+    // Extract ID and form direct download link
+    const match = item.video.match(/\/d\/(.+?)\//);
+    const id = match ? match[1] : null;
+    
+    if(id) {
+        // Try the direct download link
+        video.src = `https://drive.google.com/uc?export=download&id=${id}`;
+        video.load();
+        video.play().catch(() => {
+            // Autoplay blocked or failed, wait for user interaction or error
+        });
+    } else {
+        // Fallback immediately if ID parsing fails
+        fallbackToIframe();
+    }
 }
 
-// Close logic
+// 2. ERROR HANDLER: If Direct Stream fails (CORS/Quota), Switch to Iframe
+video.onerror = () => {
+    console.log("Custom player failed (CORS/Block), switching to Iframe...");
+    fallbackToIframe();
+};
+
+function fallbackToIframe() {
+    loader.style.display = 'none';
+    video.style.display = 'none';
+    video.pause();
+    video.src = "";
+    
+    container.classList.remove('custom-mode');
+    customControls.style.display = 'none'; // Hide custom controls
+    
+    iframe.style.display = 'block';
+    iframe.src = currentVideoLink; // Load the original /preview link
+}
+
 document.getElementById('exitBtn').onclick = closePlayer;
 function closePlayer() {
     video.pause();
     video.src = "";
+    iframe.src = ""; // Stop iframe audio
     overlay.classList.remove('active');
 }
 
-// Toggle Play/Pause
+/* Custom Controls Logic (Only works when Custom Player is successful) */
 function togglePlay() {
     if(video.paused || video.ended) video.play();
     else video.pause();
@@ -716,53 +706,36 @@ function togglePlay() {
 playPauseBtn.onclick = togglePlay;
 video.onclick = togglePlay;
 
-// Update UI on state change
 video.addEventListener('play', () => {
     playIcon.style.display = 'none';
     pauseIcon.style.display = 'block';
     container.classList.remove('paused');
     loader.style.display = 'none';
-    video.style.display = 'block';
 });
-
 video.addEventListener('pause', () => {
     playIcon.style.display = 'block';
     pauseIcon.style.display = 'none';
     container.classList.add('paused');
 });
-
 video.addEventListener('waiting', () => { loader.style.display = 'block'; });
 video.addEventListener('playing', () => { loader.style.display = 'none'; });
 
-// Time Update
 video.addEventListener('timeupdate', () => {
     const pct = (video.currentTime / video.duration) * 100;
     seekSlider.value = pct || 0;
     seekSlider.style.background = `linear-gradient(to right, var(--accent) ${pct}%, rgba(255,255,255,0.2) ${pct}%)`;
     currentTimeEl.textContent = formatTime(video.currentTime);
 });
-
 video.addEventListener('loadedmetadata', () => {
     durationEl.textContent = formatTime(video.duration);
 });
 
-// Seeking
 seekSlider.addEventListener('input', (e) => {
-    const time = (video.duration / 100) * e.target.value;
-    video.currentTime = time;
+    video.currentTime = (video.duration / 100) * e.target.value;
 });
+volumeSlider.addEventListener('input', (e) => { video.volume = e.target.value; });
+speedSelect.addEventListener('change', (e) => { video.playbackRate = parseFloat(e.target.value); });
 
-// Volume
-volumeSlider.addEventListener('input', (e) => {
-    video.volume = e.target.value;
-});
-
-// Speed
-speedSelect.addEventListener('change', (e) => {
-    video.playbackRate = parseFloat(e.target.value);
-});
-
-// Fullscreen (Wraps the container, not just video, to keep controls)
 fsBtn.onclick = () => {
     if (!document.fullscreenElement) {
         container.requestFullscreen().catch(err => console.log(err));
@@ -771,14 +744,12 @@ fsBtn.onclick = () => {
     }
 };
 
-// Format seconds to MM:SS
 function formatTime(s) {
     if(isNaN(s)) return "0:00";
     const mins = Math.floor(s / 60);
     const secs = Math.floor(s % 60);
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
-
 </script>
 </body>
 </html>
