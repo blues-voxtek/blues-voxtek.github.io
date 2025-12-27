@@ -3,379 +3,383 @@
 <head>
 <link rel="icon" href="favicon.png" type="image/png">
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <title>VoxTek Video</title>
 <style>
   :root {
-    --bg: #0f1720;
-    --card: #0b1220;
-    --muted: #9aa7b2;
-    --accent: #00b4ff;
+    --bg-dark: #000;
+    --glass-surface: rgba(255, 255, 255, 0.08);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-highlight: rgba(255, 255, 255, 0.25);
+    --accent: #0a84ff; /* Apple-like Blue */
+    --text-main: #f5f5f7;
+    --text-muted: #86868b;
   }
+
   * { box-sizing: border-box; }
 
   html, body {
     height: 100%;
-    background-color: #0000;
-  }
-
-  body {
     margin: 0;
-    font-family: "Poppins", system-ui, Arial;
-    color: #e6eef6;
-    font-size: 20px;
-    min-height: 100vh;
-    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--text-main);
     overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0%;
-    background: url("https://i.imgur.com/Q2YBbzw.png") center/cover no-repeat;
-    transform: translateZ(0);
-    z-index: -2;
-    pointer-events: none;
+  /* ---------------------------- */
+  /* FIXED BACKGROUND             */
+  /* ---------------------------- */
+  body {
+    background: url("https://i.imgur.com/Q2YBbzw.png") no-repeat center center fixed;
+    background-size: cover;
   }
+  
+  /* The dark tint overlay so text is readable */
   body::after {
     content: "";
     position: fixed;
     inset: 0;
-    background: rgba(10,15,25,0.6);
+    background: radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.85) 100%);
+    backdrop-filter: blur(20px) saturate(120%);
+    -webkit-backdrop-filter: blur(20px) saturate(120%);
     z-index: -1;
     pointer-events: none;
   }
 
   /* ---------------------------- */
-  /*     UPDATED STICKY HEADER    */
+  /* GLASSY HEADER                */
   /* ---------------------------- */
   header {
-    padding: 18px 28px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: fixed;              /* make it stick */
+    position: fixed;
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 60;
-    backdrop-filter: blur(10px);
-    background: rgba(8, 12, 20, 0.85); /* darker */
-    gap: 18px;
-  }
-
-  .header-left {
+    z-index: 100;
+    padding: 20px 40px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    justify-content: space-between;
+    background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
   }
 
   .logo {
     font-weight: 700;
     font-size: 24px;
-    color: var(--accent);
-    white-space: nowrap;
+    letter-spacing: -0.5px;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
   }
+  
+  .logo span { color: var(--accent); }
 
-  .subtitle {
-    color: var(--muted);
-    font-size: 15px;
-    white-space: nowrap;
-  }
-
-  /* Search (replaces previous subtitle spot) */
   .search-wrap {
-    margin-left: auto;
-    max-width: 520px;
-    width: 100%;
+    position: relative;
+    width: 300px;
   }
+  
   .search {
     width: 100%;
-    max-width: 520px;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: none;
-    background: rgba(255,255,255,0.06);
+    padding: 12px 20px;
+    padding-left: 40px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.4);
     color: #fff;
-    font-size: 16px;
+    font-size: 15px;
     outline: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+  }
+  
+  .search:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--accent);
+    width: 360px;
+    box-shadow: 0 0 20px rgba(10, 132, 255, 0.3);
   }
 
-  /* Offset content so it doesn’t go under header */
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  /* ---------------------------- */
+  /* LAYOUT                       */
+  /* ---------------------------- */
   main {
     padding-top: 100px;
+    padding-bottom: 60px;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 100%;
-    position: relative;
-    z-index: 5;
+    align-items: flex-start;
   }
-  /* --------------------------------------------- */
 
   .section {
     width: 100%;
-    max-width: 1700px;
-    padding: 34px 50px;
+    padding: 20px 60px;
+    margin-bottom: 20px;
   }
 
   .section h2 {
-    margin: 0 0 18px 0;
-    font-size: 20px;
-    color: #e9f2fb;
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0 0 20px 0;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   }
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(375px, 1fr));
-    gap: 35px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
     width: 100%;
   }
 
+  /* ---------------------------- */
+  /* HERO / CARDS                 */
+  /* ---------------------------- */
   .featured {
     width: 100%;
-    border-radius: 14px;
-    overflow: hidden;
+    height: 500px;
+    border-radius: 20px;
     position: relative;
-    margin-bottom: 18px;
+    overflow: hidden;
     cursor: pointer;
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    transition: all 0.3s ease;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    border: 1px solid var(--glass-border);
+  }
+
+  .featured:hover {
+    transform: scale(1.02);
+    border-color: rgba(255,255,255,0.4);
   }
 
   .featured img {
     width: 100%;
-    height: 420px;
+    height: 100%;
     object-fit: cover;
-    display: block;
-    filter: brightness(0.8);
-    transition: filter 0.3s ease, transform 0.3s ease;
   }
 
-  /* Overlayed title for featured */
-  .featured .meta {
+  .featured-overlay {
     position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    padding: 28px;
-    background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
-    z-index: 2;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 60%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 60px;
   }
 
-  .featured .meta .title {
-    font-size: 30px;
-    font-weight: 800;
-    margin-bottom: 8px;
-    color: #fff;
-    text-shadow: 0 6px 18px rgba(0,0,0,0.8);
-  }
-
-  .featured .play-btn {
-    padding: 10px 16px;
+  .featured-badge {
     background: var(--accent);
-    border-radius: 8px;
-    color: #00121a;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
     font-weight: 700;
+    font-size: 12px;
+    text-transform: uppercase;
+    width: fit-content;
+    margin-bottom: 15px;
+    box-shadow: 0 0 15px rgba(10, 132, 255, 0.6);
+  }
+
+  .featured-title {
+    font-size: 42px;
+    font-weight: 800;
+    margin: 0 0 15px 0;
+    line-height: 1.1;
+  }
+
+  .featured-btn {
+    padding: 14px 32px;
+    background: #fff;
+    color: #000;
     border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    transition: all 0.2s ease;
   }
-
-  .featured:hover {
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: 0 0 25px rgba(0,180,255,0.18);
-  }
-
-  .featured:hover img {
-    filter: brightness(1.05);
-    transform: scale(1.02);
+  
+  .featured-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 30px rgba(255,255,255,0.3);
   }
 
   .card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
-    border-radius: 15px;
+    position: relative;
+    border-radius: 16px;
     overflow: hidden;
     cursor: pointer;
-    position: relative;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    background: var(--glass-surface);
+    border: 1px solid transparent;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   }
 
-  .card:hover {
-    transform: translateY(-5px) scale(1.04);
-    box-shadow: 0 0 25px rgba(0, 180, 255, 0.5);
+  .thumb-wrap {
+    width: 100%;
+    aspect-ratio: 16/9;
+    overflow: hidden;
   }
 
   .thumb {
     width: 100%;
-    aspect-ratio: 16 / 9;
+    height: 100%;
     object-fit: cover;
-    display: block;
-    transition: filter 0.3s ease, transform 0.3s ease;
-    position: relative;
-    z-index: 1;
-    filter: brightness(0.78);
+    transition: transform 0.5s ease;
+    filter: brightness(0.9);
   }
 
-  .card:hover .thumb {
-    filter: brightness(1.05);
-    transform: scale(1.03);
-  }
-
-  /* NEW: overlay title on cards */
-  .title-overlay {
+  .card-meta {
     position: absolute;
-    left: 0;
     bottom: 0;
+    left: 0;
     width: 100%;
-    padding: 14px 16px;
-    background: linear-gradient(0deg, rgba(0,0,0,0.72), rgba(0,0,0,0));
-    color: #fff;
-    z-index: 6;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  }
+  
+  .card-title {
+    font-size: 16px;
     font-weight: 600;
-    font-size: 18px;
-    text-shadow: 0 6px 18px rgba(0,0,0,0.6);
-  }
-
-  .play-badge {
-    position: absolute;
-    left: 16px;
-    top: 16px;
-    background: rgba(0,0,0,0.45);
-    backdrop-filter: blur(3px);
-    padding: 8px 10px;
-    border-radius: 8px;
     color: #fff;
-    font-size: 16px;
-    transition: background 0.3s ease, box-shadow 0.3s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card:hover {
+    transform: scale(1.05);
     z-index: 10;
-    pointer-events: none;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.5);
+  }
+  
+  .card:hover .thumb {
+    transform: scale(1.1);
+    filter: brightness(1);
+  }
+  
+  .card:hover .card-meta {
+    transform: translateY(0);
   }
 
-  .card:hover .play-badge {
-    background: rgba(0, 180, 255, 0.14);
-    box-shadow: 0 0 12px var(--accent), 0 0 24px rgba(0,180,255,0.25);
-  }
-
-  footer {
-    padding: 22px;
-    color: var(--muted);
-    font-size: 16px;
-    text-align: center;
-    position: relative;
-    z-index: 10;
-  }
-
-  /* overlay */
+  /* ---------------------------- */
+  /* PLAYER OVERLAY (Simplified)  */
+  /* ---------------------------- */
   #overlay {
     position: fixed;
     inset: 0;
-    background: rgba(2,6,12,0.96);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
+    background: #000;
     z-index: 9999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  #overlay.active {
+    display: flex;
+    opacity: 1;
   }
 
-  #playerWrap {
+  .video-wrapper {
     width: 100%;
     height: 100%;
     position: relative;
+    background: #000;
   }
 
-  video, iframe {
+  iframe {
     width: 100%;
     height: 100%;
     border: none;
-    background: black;
+    display: block;
   }
 
-  .controlsTop {
+  .close-btn {
     position: absolute;
-    left: 25px;
-    top: 25px;
-    z-index: 10000;
+    top: 30px;
+    right: 30px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 20px;
     display: flex;
     align-items: center;
-    gap: 20px;
-  }
-
-  .btn {
-    padding: 10px 18px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    border: 0;
+    justify-content: center;
     cursor: pointer;
-    font-size: 17px;
-    transition: background 0.3s ease, transform 0.2s ease;
+    z-index: 10000; /* High z-index to sit on top of iframe */
+    transition: background 0.3s;
+  }
+  .close-btn:hover { background: rgba(255,255,255,0.2); }
+
+  footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 40px;
+    position: relative;
+    z-index: 10;
   }
 
-  .btn:hover {
-    background: rgba(255,255,255,0.15);
-    transform: scale(1.05);
-  }
-
-  .videoTitle {
-    font-size: 19px;
-    color: #fff;
-    transition: opacity 0.4s ease;
-  }
-
-  @media (max-width: 1500px) {
-    .grid { grid-template-columns: repeat(3, minmax(320px, 1fr)); }
-  }
-  @media (max-width: 1100px) {
-    .grid { grid-template-columns: repeat(2, minmax(280px, 1fr)); }
-    .subtitle { display: none; }
-    .featured img { height: 320px; }
-  }
-  @media (max-width: 700px) {
-    header { padding: 12px 14px; gap: 8px; }
-    .grid { grid-template-columns: 1fr; padding: 18px; }
-    .featured img { height: 200px; }
-    .search { max-width: 220px; }
+  @media (max-width: 768px) {
+    header { padding: 15px 20px; }
+    .search-wrap { display: none; }
+    .section { padding: 20px; }
+    .featured-title { font-size: 28px; }
+    .featured { height: 350px; }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="header-left">
-    <div class="logo">VoxTek Video</div>
-    <div class="subtitle">Hell's Most Popular Streaming Service — Trust Us With Your Entertainment</div>
-  </div>
-
-  <!-- Search input replaces previous subtitle spot as requested -->
+  <div class="logo">VoxTek <span>Video</span></div>
   <div class="search-wrap">
-    <input id="searchInput" class="search" type="search" placeholder="Search episodes, songs, titles..." aria-label="Search titles">
+    <span class="search-icon">🔍</span>
+    <input id="searchInput" class="search" type="search" placeholder="Search..." aria-label="Search">
   </div>
 </header>
 
-<main id="main"></main>
+<main id="main">
+  </main>
 
-<!-- fullscreen overlay -->
-<div id="overlay" role="dialog" aria-hidden="true">
-  <div class="controlsTop">
-    <button id="exitBtn" class="btn">Exit</button>
-    <div id="videoTitle" class="videoTitle"></div>
-  </div>
+<footer>
+  <p>VoxTek Video © — Trust Us With Your Entertainment</p>
+</footer>
 
-  <div id="playerWrap">
-    <video id="player" controls playsinline></video>
-    <iframe id="gdPlayer" style="display:none;" allow="autoplay"></iframe>
+<div id="overlay">
+  <div class="video-wrapper">
+    <div class="close-btn" id="exitBtn">✕</div>
+    <iframe id="iframePlayer" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
   </div>
 </div>
 
-<footer>
-  <small>We Present VOXTEK VIDEO! We dont want to steal your data, really. But we will - Trust Us©</small>
-</footer>
-
 <script>
-/* ---------- MOVIES ARRAY (UNCHANGED) ---------- */
 const movies = [
   { title: "[S2/E4] Its A Deal", cover: "https://i.imgur.com/AOk6KKM.png", video: "https://drive.google.com/file/d/1GSRutDwFwKQrxQLI8o9C1yRyGgz2HRqO/preview", isMusic: false, isFeatured: false },
   { title: "[S2/E5] Silenced | SO FAR", cover: "https://i.imgur.com/tWPq9Bh.png", video: "https://drive.google.com/file/d/1CKGgmZsT4UDFuxo7MaL6QrCn8rKAPm1L/preview", isMusic: false, isFeatured: true },
@@ -391,175 +395,93 @@ const movies = [
   { title: "Once We Get Up There", cover: "https://i.imgur.com/kO5lufE.png", video: "https://drive.google.com/file/d/17mq-fm3oIxExAUMqkMTMlZ8rOmX21yWj/preview", isMusic: true, isFeatured: false },
 ];
 
+/* ----------------------------------------------------
+   UI GENERATION
+   ---------------------------------------------------- */
 const main = document.getElementById('main');
 
-/* helper to create a section container with heading */
-function createSection(title, contentEl) {
-  const sec = document.createElement('section');
-  sec.className = 'section';
-  const h = document.createElement('h2');
-  h.textContent = title;
-  sec.appendChild(h);
-  sec.appendChild(contentEl);
-  return sec;
+function createSection(title, content) {
+    const s = document.createElement('section');
+    s.className = 'section';
+    const h = document.createElement('h2');
+    h.textContent = title;
+    s.appendChild(h);
+    s.appendChild(content);
+    return s;
 }
 
-/* create grid of cards from items */
 function createGrid(items) {
-  const g = document.createElement('div');
-  g.className = 'grid';
-  items.forEach(m => g.appendChild(mkCard(m)));
-  return g;
+    const g = document.createElement('div');
+    g.className = 'grid';
+    items.forEach(item => {
+        const c = document.createElement('div');
+        c.className = 'card';
+        c.innerHTML = `
+            <div class="thumb-wrap"><img src="${item.cover}" class="thumb" loading="lazy"></div>
+            <div class="card-meta">
+                <div class="card-title">${item.title}</div>
+            </div>
+        `;
+        c.onclick = () => loadVideo(item);
+        g.appendChild(c);
+    });
+    return g;
 }
 
-/* create a single card element (title overlayed) */
-function mkCard(m) {
-  const d = document.createElement('div');
-  d.className = 'card';
-  d.tabIndex = 0;
-
-  // keep play-badge, thumb and title — title moved into overlay
-  d.innerHTML = `
-    <div class="play-badge">▶ Play</div>
-    <img class="thumb" src="${m.cover}" alt="${m.title} cover" loading="lazy"/>
-    <div class="title-overlay">${m.title}</div>
-  `;
-
-  // events preserved (click and keypress)
-  d.addEventListener('click', ()=> openPlayer(m));
-  d.addEventListener('keypress', (e)=> { if(e.key === 'Enter') openPlayer(m); });
-
-  return d;
-}
-
-/* build featured element (title overlayed on image) */
-const featuredMovie = movies.find(m => m.isFeatured) || movies[0];
-const featuredEl = document.createElement('div');
-featuredEl.className = 'featured';
-featuredEl.innerHTML = `
-  <img src="${featuredMovie.cover}" alt="${featuredMovie.title}" />
-  <div class="meta">
-    <div class="title">${featuredMovie.title}</div>
-    <button class="play-btn">▶ Play</button>
-  </div>
+const featItem = movies.find(m => m.isFeatured) || movies[0];
+const featDiv = document.createElement('div');
+featDiv.className = 'featured';
+featDiv.innerHTML = `
+    <img src="${featItem.cover}">
+    <div class="featured-overlay">
+        <div class="featured-badge">Featured Episode</div>
+        <div class="featured-title">${featItem.title}</div>
+        <button class="featured-btn">▶ Watch Now</button>
+    </div>
 `;
+featDiv.onclick = () => loadVideo(featItem);
 
-/* clicking featured opens player (same behavior as cards) */
-featuredEl.addEventListener('click', ()=> openPlayer(featuredMovie));
-featuredEl.querySelector('.play-btn').addEventListener('click', (e) => { e.stopPropagation(); openPlayer(featuredMovie); });
+main.appendChild(createSection('Featured', featDiv));
+main.appendChild(createSection('Episodes', createGrid(movies.filter(m => !m.isMusic))));
+main.appendChild(createSection('Songs', createGrid(movies.filter(m => m.isMusic))));
 
-/* append sections to main (episodes + songs), logic unchanged */
-main.appendChild(createSection('Featured', featuredEl));
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    const val = e.target.value.toLowerCase();
+    document.querySelectorAll('.card').forEach(card => {
+        const txt = card.querySelector('.card-title').textContent.toLowerCase();
+        card.style.display = txt.includes(val) ? '' : 'none';
+    });
+});
 
-const episodes = movies.filter(m => m.isMusic === false);
-const songs = movies.filter(m => m.isMusic === true);
-
-main.appendChild(createSection('Full Episodes', createGrid(episodes)));
-main.appendChild(createSection('Song Covers', createGrid(songs)));
-
-/* ---------- PLAYER / OVERLAY LOGIC (UNCHANGED FUNCTIONALITY) ---------- */
+/* ----------------------------------------------------
+   PLAYER LOGIC (Simpler & More Reliable)
+   ---------------------------------------------------- */
 const overlay = document.getElementById('overlay');
-const player = document.getElementById('player');
-const gdPlayer = document.getElementById('gdPlayer');
+const iframe = document.getElementById('iframePlayer');
 const exitBtn = document.getElementById('exitBtn');
-const videoTitle = document.getElementById('videoTitle');
 
-function openPlayer(item){
-  if (!item || !item.video) return alert('This Song/Episode has not released yet');
-
-  const isDrive = item.video.includes("drive.google.com");
-
-  videoTitle.textContent = item.title;
-  overlay.style.display = 'flex';
-  overlay.setAttribute('aria-hidden','false');
-
-  if (isDrive) {
-    player.style.display = "none";
-    try { player.pause(); } catch(e){}
-    player.removeAttribute("src");
-
-    gdPlayer.style.display = "block";
-    gdPlayer.src = item.video;
-
-  } else {
-    gdPlayer.style.display = "none";
-    gdPlayer.src = "";
-
-    player.style.display = "block";
-    player.src = item.video;
-    player.load();
-    player.play()?.catch(()=>{});
-  }
-
-  let hideTimer;
-  const showTitle = () => {
-    videoTitle.style.opacity = '1';
-    clearTimeout(hideTimer);
-    hideTimer = setTimeout(()=> videoTitle.style.opacity = '0', 2500);
-  };
-  document.onmousemove = showTitle;
-  showTitle();
+function loadVideo(item) {
+    if(!item.video) return;
+    
+    // Just load the iframe immediately. No fancy checks.
+    overlay.classList.add('active');
+    iframe.src = item.video;
 }
 
-function closePlayer(){
-  try { player.pause(); } catch(e){}
-  player.removeAttribute('src');
-  player.style.display = "none";
-
-  gdPlayer.src = "";
-  gdPlayer.style.display = "none";
-
-  overlay.style.display = 'none';
-  overlay.setAttribute('aria-hidden','true');
-  document.onmousemove = null;
+function closePlayer() {
+    // Clear src to stop audio playing in background
+    iframe.src = "";
+    overlay.classList.remove('active');
 }
 
-exitBtn.addEventListener('click', closePlayer);
-overlay.addEventListener('click', (e)=> { if(e.target === overlay) closePlayer(); });
-document.addEventListener('keydown', (e)=> { if(e.key === 'Escape' && overlay.style.display === 'flex') closePlayer(); });
+exitBtn.onclick = closePlayer;
 
-/* ---------- SEARCH: filters visible cards in both sections (non-destructive) ---------- */
-const searchInput = document.getElementById('searchInput');
-searchInput.addEventListener('input', onSearch);
-
-function onSearch(e){
-  const q = (e.target.value || '').trim().toLowerCase();
-  // show/hide cards by matching title text
-  const allCards = Array.from(document.querySelectorAll('.card'));
-  allCards.forEach(card => {
-    const titleText = (card.querySelector('.title-overlay')?.textContent || '').toLowerCase();
-    if (!q) {
-      card.style.display = '';
-    } else {
-      card.style.display = titleText.includes(q) ? '' : 'none';
+// Close on escape key
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && overlay.classList.contains('active')) {
+        closePlayer();
     }
-  });
-
-  // also filter featured section visibility (do not remove; just hide if not match)
-  const featuredTitle = featuredMovie.title.toLowerCase();
-  const featuredSection = document.querySelector('.featured');
-  if (featuredSection) {
-    if (!q) {
-      featuredSection.style.display = '';
-    } else {
-      featuredSection.style.display = featuredTitle.includes(q) ? '' : 'none';
-    }
-  }
-}
-
-/* Keep this so any existing site script at that URL still loads (as in original) */
+});
 </script>
-
-
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
