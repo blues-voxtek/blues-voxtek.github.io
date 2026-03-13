@@ -11,7 +11,7 @@
     --glass-surface: rgba(255, 255, 255, 0.08);
     --glass-border: rgba(255, 255, 255, 0.12);
     --glass-highlight: rgba(255, 255, 255, 0.25);
-    --accent: #0a84ff; /* Apple-like Blue */
+    --accent: #0a84ff;
     --text-main: #f5f5f7;
     --text-muted: #86868b;
   }
@@ -27,15 +27,11 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ---------------------------- */
-  /* FIXED BACKGROUND             */
-  /* ---------------------------- */
   body {
     background: url("https://i.imgur.com/Q2YBbzw.png") no-repeat center center fixed;
     background-size: cover;
   }
-  
-  /* The dark tint overlay so text is readable */
+
   body::after {
     content: "";
     position: fixed;
@@ -45,9 +41,175 @@
     pointer-events: none;
   }
 
-  /* ---------------------------- */
-  /* GLASSY HEADER                */
-  /* ---------------------------- */
+  /* -------------------------------- */
+  /* PASSWORD GATE                    */
+  /* -------------------------------- */
+  #password-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.95) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: opacity 0.5s ease;
+  }
+
+  #password-gate.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .gate-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+    padding: 52px 48px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 24px;
+    box-shadow:
+      0 40px 80px rgba(0,0,0,0.6),
+      inset 0 1px 0 rgba(255,255,255,0.12);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    width: 360px;
+    animation: gateIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  @keyframes gateIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.96); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .gate-logo {
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: -0.5px;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+
+  .gate-logo span { color: var(--accent); }
+
+  .gate-lock {
+    width: 56px;
+    height: 56px;
+    background: rgba(10, 132, 255, 0.15);
+    border: 1px solid rgba(10, 132, 255, 0.35);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 0 24px rgba(10, 132, 255, 0.2);
+  }
+
+  .gate-label {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  .gate-input-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  #gate-input {
+    width: 100%;
+    padding: 14px 48px 14px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    letter-spacing: 0.06em;
+    transition: all 0.25s ease;
+  }
+
+  #gate-input:focus {
+    border-color: var(--accent);
+    background: rgba(10, 132, 255, 0.08);
+    box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.18);
+  }
+
+  #gate-input.shake {
+    animation: shake 0.4s ease;
+    border-color: #ff453a;
+    box-shadow: 0 0 0 3px rgba(255, 69, 58, 0.2);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%       { transform: translateX(-8px); }
+    40%       { transform: translateX(8px); }
+    60%       { transform: translateX(-5px); }
+    80%       { transform: translateX(5px); }
+  }
+
+  .toggle-eye {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 18px;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .toggle-eye:hover { color: #fff; }
+
+  #gate-error {
+    font-size: 13px;
+    color: #ff453a;
+    min-height: 18px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  #gate-error.visible { opacity: 1; }
+
+  #gate-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 20px rgba(10, 132, 255, 0.35);
+  }
+
+  #gate-btn:hover {
+    background: #2997ff;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 28px rgba(10, 132, 255, 0.5);
+  }
+
+  #gate-btn:active { transform: translateY(0); }
+
+  /* -------------------------------- */
+  /* MAIN SITE (hidden until unlocked) */
+  /* -------------------------------- */
+  #site-content {
+    display: none;
+  }
+
   header {
     position: fixed;
     top: 0;
@@ -68,14 +230,14 @@
     color: #fff;
     text-shadow: 0 2px 10px rgba(0,0,0,0.5);
   }
-  
+
   .logo span { color: var(--accent); }
 
   .search-wrap {
     position: relative;
     width: 300px;
   }
-  
+
   .search {
     width: 100%;
     padding: 12px 20px;
@@ -89,7 +251,7 @@
     transition: all 0.3s ease;
     backdrop-filter: blur(10px);
   }
-  
+
   .search:focus {
     background: rgba(255, 255, 255, 0.15);
     border-color: var(--accent);
@@ -106,9 +268,6 @@
     pointer-events: none;
   }
 
-  /* ---------------------------- */
-  /* LAYOUT                       */
-  /* ---------------------------- */
   main {
     padding-top: 100px;
     padding-bottom: 60px;
@@ -142,9 +301,6 @@
     width: 100%;
   }
 
-  /* ---------------------------- */
-  /* HERO / CARDS                 */
-  /* ---------------------------- */
   .featured {
     width: 100%;
     height: 500px;
@@ -213,7 +369,7 @@
     width: fit-content;
     transition: all 0.2s ease;
   }
-  
+
   .featured-btn:hover {
     transform: scale(1.05);
     box-shadow: 0 0 30px rgba(255,255,255,0.3);
@@ -256,7 +412,7 @@
     transition: transform 0.3s ease;
     border-top: 1px solid rgba(255,255,255,0.1);
   }
-  
+
   .card-title {
     font-size: 16px;
     font-weight: 600;
@@ -272,19 +428,16 @@
     box-shadow: 0 20px 40px rgba(0,0,0,0.6);
     border: 1px solid rgba(255,255,255,0.5);
   }
-  
+
   .card:hover .thumb {
     transform: scale(1.1);
     filter: brightness(1);
   }
-  
+
   .card:hover .card-meta {
     transform: translateY(0);
   }
 
-  /* ---------------------------- */
-  /* PLAYER OVERLAY (Simplified)  */
-  /* ---------------------------- */
   #overlay {
     position: fixed;
     inset: 0;
@@ -294,7 +447,7 @@
     opacity: 0;
     transition: opacity 0.3s ease;
   }
-  
+
   #overlay.active {
     display: flex;
     opacity: 1;
@@ -330,9 +483,10 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 10000; /* High z-index to sit on top of iframe */
+    z-index: 10000;
     transition: background 0.3s;
   }
+
   .close-btn:hover { background: rgba(255,255,255,0.2); }
 
   footer {
@@ -350,34 +504,109 @@
     .section { padding: 20px; }
     .featured-title { font-size: 28px; }
     .featured { height: 350px; }
+    .gate-box { width: 90%; padding: 40px 28px; }
   }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">VoxTek <span>Video</span></div>
-  <div class="search-wrap">
-    <span class="search-icon">🔍</span>
-    <input id="searchInput" class="search" type="search" placeholder="Search..." aria-label="Search">
-  </div>
-</header>
-
-<main id="main">
-  </main>
-
-<footer>
-  <p>We Present VOXTEK VIDEO! We dont want to steal your data, really. But we will - Trust Us©</p>
-</footer>
-
-<div id="overlay">
-  <div class="video-wrapper">
-    <div class="close-btn" id="exitBtn">✕</div>
-    <iframe id="iframePlayer" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
+<!-- PASSWORD GATE -->
+<div id="password-gate">
+  <div class="gate-box">
+    <div class="gate-logo">VoxTek <span>Video</span></div>
+    <div class="gate-lock">🔒</div>
+    <p class="gate-label">This content is private.<br>Enter the password to continue.</p>
+    <div class="gate-input-wrap">
+      <input
+        id="gate-input"
+        type="password"
+        placeholder="Password"
+        autocomplete="current-password"
+        autofocus
+      />
+      <button class="toggle-eye" id="toggle-eye" title="Show/hide password">👁</button>
+    </div>
+    <div id="gate-error">Incorrect password. Try again.</div>
+    <button id="gate-btn">Enter</button>
   </div>
 </div>
 
+<!-- MAIN SITE (hidden until password accepted) -->
+<div id="site-content">
+
+  <header>
+    <div class="logo">VoxTek <span>Video</span></div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input id="searchInput" class="search" type="search" placeholder="Search..." aria-label="Search">
+    </div>
+  </header>
+
+  <main id="main"></main>
+
+  <footer>
+    <p>We Present VOXTEK VIDEO! We dont want to steal your data, really. But we will - Trust Us©</p>
+  </footer>
+
+  <div id="overlay">
+    <div class="video-wrapper">
+      <div class="close-btn" id="exitBtn">✕</div>
+      <iframe id="iframePlayer" allow="autoplay; encrypted-media; fullscreen; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
+</div>
+
 <script>
+/* -------------------------------- */
+/* PASSWORD GATE LOGIC              */
+/* -------------------------------- */
+const CORRECT_PASSWORD = "TrustUs";
+
+const gate      = document.getElementById('password-gate');
+const gateInput = document.getElementById('gate-input');
+const gateBtn   = document.getElementById('gate-btn');
+const gateError = document.getElementById('gate-error');
+const toggleEye = document.getElementById('toggle-eye');
+const siteContent = document.getElementById('site-content');
+
+function tryUnlock() {
+  if (gateInput.value === CORRECT_PASSWORD) {
+    gate.classList.add('hidden');
+    siteContent.style.display = 'block';
+    // Remove gate from DOM after fade finishes
+    setTimeout(() => gate.remove(), 600);
+    // Focus search after unlock
+    document.getElementById('searchInput').focus();
+  } else {
+    gateError.classList.add('visible');
+    gateInput.classList.remove('shake');
+    // Trigger reflow so animation restarts
+    void gateInput.offsetWidth;
+    gateInput.classList.add('shake');
+    gateInput.value = '';
+    gateInput.focus();
+    // Hide error message after a moment
+    setTimeout(() => gateError.classList.remove('visible'), 3000);
+  }
+}
+
+gateBtn.addEventListener('click', tryUnlock);
+gateInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') tryUnlock();
+});
+
+// Show/hide password toggle
+let eyeVisible = false;
+toggleEye.addEventListener('click', () => {
+  eyeVisible = !eyeVisible;
+  gateInput.type = eyeVisible ? 'text' : 'password';
+  toggleEye.textContent = eyeVisible ? '🙈' : '👁';
+});
+
+/* -------------------------------- */
+/* MOVIES DATA                      */
+/* -------------------------------- */
 const movies = [
   { title: "[S2/E4] Its A Deal", cover: "https://i.imgur.com/AOk6KKM.png", video: "https://drive.google.com/file/d/1GSRutDwFwKQrxQLI8o9C1yRyGgz2HRqO/preview", isMusic: false, isFeatured: false },
   { title: "[S2/E5] Silenced | SO FAR", cover: "https://i.imgur.com/tWPq9Bh.png", video: "https://drive.google.com/file/d/1R3R0tsbg4QzlzOvm6F9evVICbvyJgBZd/preview", isMusic: false, isFeatured: true },
@@ -395,101 +624,87 @@ const movies = [
   { title: "VOX DEI [GERMAN/DEUTSCH]", cover: "https://i.imgur.com/OKBnOqZ.png", video: "https://drive.google.com/file/d/1kRcrZRdk_0I2HQlLqzJ7Q8-TWUhJra-S/preview", isMusic: true, isFeatured: false },
 ];
 
-/* ----------------------------------------------------
-   UI GENERATION
-   ---------------------------------------------------- */
-const main = document.getElementById('main');
+/* -------------------------------- */
+/* UI GENERATION                    */
+/* -------------------------------- */
+const mainEl = document.getElementById('main');
 
 function createSection(title, content) {
-    const s = document.createElement('section');
-    s.className = 'section';
-    const h = document.createElement('h2');
-    h.textContent = title;
-    s.appendChild(h);
-    s.appendChild(content);
-    return s;
+  const s = document.createElement('section');
+  s.className = 'section';
+  const h = document.createElement('h2');
+  h.textContent = title;
+  s.appendChild(h);
+  s.appendChild(content);
+  return s;
 }
 
 function createGrid(items) {
-    const g = document.createElement('div');
-    g.className = 'grid';
-    items.forEach(item => {
-        const c = document.createElement('div');
-        c.className = 'card';
-        c.innerHTML = `
-            <div class="thumb-wrap"><img src="${item.cover}" class="thumb" loading="lazy"></div>
-            <div class="card-meta">
-                <div class="card-title">${item.title}</div>
-            </div>
-        `;
-        c.onclick = () => loadVideo(item);
-        g.appendChild(c);
-    });
-    return g;
+  const g = document.createElement('div');
+  g.className = 'grid';
+  items.forEach(item => {
+    const c = document.createElement('div');
+    c.className = 'card';
+    c.innerHTML = `
+      <div class="thumb-wrap"><img src="${item.cover}" class="thumb" loading="lazy"></div>
+      <div class="card-meta">
+        <div class="card-title">${item.title}</div>
+      </div>
+    `;
+    c.onclick = () => loadVideo(item);
+    g.appendChild(c);
+  });
+  return g;
 }
 
 const featItem = movies.find(m => m.isFeatured) || movies[0];
 const featDiv = document.createElement('div');
 featDiv.className = 'featured';
 featDiv.innerHTML = `
-    <img src="${featItem.cover}">
-    <div class="featured-overlay">
-        <div class="featured-badge">Featured</div>
-        <div class="featured-title">${featItem.title}</div>
-        <button class="featured-btn">▶ Watch Now</button>
-    </div>
+  <img src="${featItem.cover}">
+  <div class="featured-overlay">
+    <div class="featured-badge">Featured</div>
+    <div class="featured-title">${featItem.title}</div>
+    <button class="featured-btn">▶ Watch Now</button>
+  </div>
 `;
 featDiv.onclick = () => loadVideo(featItem);
 
-main.appendChild(createSection('Featured', featDiv));
-main.appendChild(createSection('Episodes', createGrid(movies.filter(m => !m.isMusic))));
-main.appendChild(createSection('Songs', createGrid(movies.filter(m => m.isMusic))));
+mainEl.appendChild(createSection('Featured', featDiv));
+mainEl.appendChild(createSection('Episodes', createGrid(movies.filter(m => !m.isMusic))));
+mainEl.appendChild(createSection('Songs', createGrid(movies.filter(m => m.isMusic))));
 
 document.getElementById('searchInput').addEventListener('input', (e) => {
-    const val = e.target.value.toLowerCase();
-    document.querySelectorAll('.card').forEach(card => {
-        const txt = card.querySelector('.card-title').textContent.toLowerCase();
-        card.style.display = txt.includes(val) ? '' : 'none';
-    });
+  const val = e.target.value.toLowerCase();
+  document.querySelectorAll('.card').forEach(card => {
+    const txt = card.querySelector('.card-title').textContent.toLowerCase();
+    card.style.display = txt.includes(val) ? '' : 'none';
+  });
 });
 
-/* ----------------------------------------------------
-   PLAYER LOGIC (Simpler & More Reliable)
-   ---------------------------------------------------- */
-const overlay = document.getElementById('overlay');
-const iframe = document.getElementById('iframePlayer');
-const exitBtn = document.getElementById('exitBtn');
+/* -------------------------------- */
+/* PLAYER LOGIC                     */
+/* -------------------------------- */
+const overlay  = document.getElementById('overlay');
+const iframe   = document.getElementById('iframePlayer');
+const exitBtn  = document.getElementById('exitBtn');
 
 function loadVideo(item) {
-    if(!item.video) return;
-    
-    // Just load the iframe immediately. No fancy checks.
-    overlay.classList.add('active');
-    iframe.src = item.video;
+  if (!item.video) return;
+  overlay.classList.add('active');
+  iframe.src = item.video;
 }
 
 function closePlayer() {
-    // Clear src to stop audio playing in background
-    iframe.src = "";
-    overlay.classList.remove('active');
+  iframe.src = "";
+  overlay.classList.remove('active');
 }
 
 exitBtn.onclick = closePlayer;
 
-// Close on escape key
 document.addEventListener('keydown', (e) => {
-    if(e.key === 'Escape' && overlay.classList.contains('active')) {
-        closePlayer();
-    }
+  if (e.key === 'Escape' && overlay.classList.contains('active')) closePlayer();
 });
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
