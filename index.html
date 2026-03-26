@@ -562,6 +562,7 @@
 /* PASSWORD GATE LOGIC              */
 /* -------------------------------- */
 const CORRECT_PASSWORD = "TrustUs";
+const CACHE_KEY = "voxtek_unlocked";
 
 const gate      = document.getElementById('password-gate');
 const gateInput = document.getElementById('gate-input');
@@ -570,8 +571,15 @@ const gateError = document.getElementById('gate-error');
 const toggleEye = document.getElementById('toggle-eye');
 const siteContent = document.getElementById('site-content');
 
+// Skip gate if already authenticated in this browser
+if (localStorage.getItem(CACHE_KEY) === "1") {
+  gate.remove();
+  siteContent.style.display = 'block';
+}
+
 function tryUnlock() {
   if (gateInput.value === CORRECT_PASSWORD) {
+    localStorage.setItem(CACHE_KEY, "1");
     gate.classList.add('hidden');
     siteContent.style.display = 'block';
     // Remove gate from DOM after fade finishes
