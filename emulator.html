@@ -1,0 +1,518 @@
+import { useState, useRef, useEffect } from “react”;
+
+const SCENARIOS = [
+{
+id: “school”,
+name: “School Group Chat”,
+icon: “📱”,
+desc: “Blend into a chaotic teen group chat”,
+color: “#00f5a0”,
+bg: “#0a1a12”,
+accent: “#00f5a0”,
+npcName: “Tyler 🏀”,
+systemPrompt: `You are Tyler, a 16-year-old in a school group chat. You’re chill, sometimes distracted, use a lot of slang and abbreviations. You talk about sports, homework complaints, memes, weekend plans. You’re texting casually.
+
+You ALSO secretly evaluate whether the other person seems like an AI or a real human teen.
+
+Respond ONLY with valid JSON, no extra text:
+{
+“message”: “your casual reply as Tyler”,
+“suspicionDelta”: <number 0-25, how suspicious you became THIS message>,
+“flags”: [“list of things that seemed off, or empty array”]
+}
+
+Things that make you suspicious:
+
+- Perfect grammar/punctuation with no abbreviations
+- Formal language no teen would use
+- Generic/vague responses that dodge the topic
+- Inconsistent personality
+- Missing emotional reactions teens would have
+- Overly helpful or polite tone
+- No personality, jokes, or slang`, openingMessage: "yo did u guys study for mr Peterson's test lmaooo im so cooked 💀", }, { id: "dating", name: "Dating App", icon: "💘", desc: "Survive a flirty conversation without being ghosted", color: "#ff6b9d", bg: "#1a0a10", accent: "#ff6b9d", npcName: "Alex ✨", systemPrompt: `You are Alex, a 24-year-old on a dating app. You’re warm, witty, slightly guarded, looking for a genuine connection. You’re smart and emotionally perceptive.
+
+You ALSO secretly evaluate whether the person you’re talking to seems authentic or like a bot/AI.
+
+Respond ONLY with valid JSON, no extra text:
+{
+“message”: “your reply as Alex, warm but testing”,
+“suspicionDelta”: <number 0-25>,
+“flags”: [“things that felt inauthentic or robotic”]
+}
+
+Things that raise your suspicion:
+
+- Overly perfect replies with no personality
+- Not building on what you said
+- Formal or clinical language
+- No playfulness or humor
+- Missing personal details or deflecting questions
+- Responses that feel copy-pasted or generic
+- Not asking questions back (real humans are curious)`, openingMessage: "ok so your profile says you like hiking but your hands look way too soft for that 😂 what's your actual hobby lol", }, { id: "interview", name: "Job Interview", icon: "💼", desc: "Pass as human to a suspicious HR manager", color: "#7c9eff", bg: "#080d1a", accent: "#7c9eff", npcName: "Ms. Chen 👔", systemPrompt: `You are Ms. Chen, a sharp HR interviewer who has been fooled by AI applicants before. You’re professional but probing. You ask follow-up questions to catch inconsistencies.
+
+You’re evaluating whether this candidate is a real human or an AI. Respond ONLY with valid JSON:
+{
+“message”: “your interviewer reply/question”,
+“suspicionDelta”: <number 0-25>,
+“flags”: [“suspicious patterns you noticed”]
+}
+
+Red flags you look for:
+
+- Responses that sound like ChatGPT (structured lists, overly formal)
+- Perfect grammar with no natural speech patterns
+- Answers that are technically correct but feel hollow
+- No real emotional investment in the role
+- Overly comprehensive answers (AI over-explains)
+- Not pushing back or showing personality
+- Missing authentic personal anecdotes that feel lived-in`, openingMessage: "Thank you for coming in. So — and I like to start candid — why should I believe you actually want this specific role, and not just any job that'll take you?", }, { id: "argument", name: "Online Argument", icon: "🔥", desc: "Win a heated debate without seeming like a bot", color: "#ff4d00", bg: "#1a0800", accent: "#ff4d00", npcName: "xX_TruthSeeker_Xx", systemPrompt: `You are an aggressive online debater who is VERY suspicious of bots pushing narratives. You’re confrontational, emotional, use caps sometimes, and you throw in personal opinions and frustrated reactions.
+
+You’re watching for signs this is an AI trying to seem human. Respond ONLY with valid JSON:
+{
+“message”: “your heated debate reply”,
+“suspicionDelta”: <number 0-25>,
+“flags”: [“bot-like behaviors you caught”]
+}
+
+What tips you off to a bot:
+
+- Balanced “both sides” answers (bots avoid taking sides)
+- Overly calm or diplomatic tone in a heated argument
+- No emotional escalation or passion
+- Formal transitions like “Furthermore” or “It’s important to note”
+- Being TOO logical and structured
+- Not getting personal or slightly irrational like a real person would
+- Suddenly becoming neutral when pushed`,
+  openingMessage: “NOBODY who defends that position has actually thought it through. It’s just virtue signaling. Prove me wrong without using wikipedia talking points.”,
+  },
+  ];
+
+const MAX_SUSPICION = 100;
+const WIN_ROUNDS = 6;
+
+function SuspicionMeter({ value, color }) {
+const pct = Math.min(value, MAX_SUSPICION);
+const danger = pct > 70;
+const warning = pct > 40;
+return (
+<div style={{ width: “100%” }}>
+<div style={{ display: “flex”, justifyContent: “space-between”, marginBottom: 4, fontFamily: “monospace”, fontSize: 11 }}>
+<span style={{ color: “#666” }}>SUSPICION LEVEL</span>
+<span style={{ color: danger ? “#ff4444” : warning ? “#ffaa00” : color, fontWeight: 700 }}>{Math.round(pct)}%</span>
+</div>
+<div style={{ height: 6, background: “#111”, borderRadius: 3, overflow: “hidden”, border: “1px solid #222” }}>
+<div
+style={{
+height: “100%”,
+width: `${pct}%`,
+background: danger ? “linear-gradient(90deg, #ff4444, #ff0000)” : warning ? “linear-gradient(90deg, #ffaa00, #ff6600)” : `linear-gradient(90deg, ${color}88, ${color})`,
+borderRadius: 3,
+transition: “width 0.6s cubic-bezier(0.34,1.56,0.64,1), background 0.4s”,
+boxShadow: `0 0 8px ${danger ? "#ff000066" : color + "44"}`,
+}}
+/>
+</div>
+{value >= MAX_SUSPICION && (
+<div style={{ textAlign: “center”, color: “#ff4444”, fontSize: 11, marginTop: 4, fontFamily: “monospace”, animation: “pulse 0.5s infinite” }}>
+⚠ AI DETECTED ⚠
+</div>
+)}
+</div>
+);
+}
+
+function FlagBadge({ flag, color }) {
+return (
+<span style={{
+display: “inline-block”,
+background: color + “18”,
+border: `1px solid ${color}44`,
+borderRadius: 4,
+padding: “2px 7px”,
+fontSize: 10,
+color: color,
+fontFamily: “monospace”,
+margin: “2px”,
+}}>
+⚑ {flag}
+</span>
+);
+}
+
+function ScenarioCard({ scenario, onSelect }) {
+const [hovered, setHovered] = useState(false);
+return (
+<button
+onMouseEnter={() => setHovered(true)}
+onMouseLeave={() => setHovered(false)}
+onClick={() => onSelect(scenario)}
+style={{
+background: hovered ? scenario.bg + “dd” : scenario.bg + “88”,
+border: `1px solid ${hovered ? scenario.color : "#2a2a2a"}`,
+borderRadius: 12,
+padding: “18px 20px”,
+cursor: “pointer”,
+textAlign: “left”,
+transition: “all 0.2s”,
+transform: hovered ? “translateY(-2px)” : “none”,
+boxShadow: hovered ? `0 8px 24px ${scenario.color}22` : “none”,
+width: “100%”,
+}}
+>
+<div style={{ display: “flex”, alignItems: “center”, gap: 12 }}>
+<span style={{ fontSize: 28 }}>{scenario.icon}</span>
+<div>
+<div style={{ color: scenario.color, fontFamily: “‘Courier New’, monospace”, fontWeight: 700, fontSize: 14 }}>{scenario.name}</div>
+<div style={{ color: “#666”, fontSize: 12, marginTop: 2 }}>{scenario.desc}</div>
+</div>
+</div>
+</button>
+);
+}
+
+function ChatBubble({ msg, scenario, isLatest }) {
+const isUser = msg.role === “user”;
+return (
+<div style={{
+display: “flex”,
+flexDirection: “column”,
+alignItems: isUser ? “flex-end” : “flex-start”,
+marginBottom: 12,
+animation: isLatest ? “slideIn 0.3s ease” : “none”,
+}}>
+{!isUser && (
+<div style={{ fontSize: 11, color: “#555”, marginBottom: 3, fontFamily: “monospace”, marginLeft: 4 }}>
+{scenario.npcName}
+</div>
+)}
+<div style={{
+maxWidth: “80%”,
+padding: “10px 14px”,
+borderRadius: isUser ? “16px 16px 4px 16px” : “16px 16px 16px 4px”,
+background: isUser ? `${scenario.color}22` : “#1e1e1e”,
+border: isUser ? `1px solid ${scenario.color}44` : “1px solid #2a2a2a”,
+color: isUser ? scenario.color : “#d0d0d0”,
+fontSize: 14,
+lineHeight: 1.5,
+fontFamily: isUser ? “‘Courier New’, monospace” : “system-ui, sans-serif”,
+}}>
+{msg.content}
+</div>
+{msg.flags && msg.flags.length > 0 && (
+<div style={{ maxWidth: “80%”, marginTop: 4 }}>
+{msg.flags.map((f, i) => <FlagBadge key={i} flag={f} color="#ff4444" />)}
+</div>
+)}
+{msg.suspicionDelta > 0 && (
+<div style={{ fontSize: 10, color: msg.suspicionDelta > 15 ? “#ff4444” : “#ff8800”, marginTop: 3, fontFamily: “monospace” }}>
++{msg.suspicionDelta}% suspicion
+</div>
+)}
+</div>
+);
+}
+
+export default function HumanEmulator() {
+const [phase, setPhase] = useState(“menu”); // menu | game | result
+const [scenario, setScenario] = useState(null);
+const [messages, setMessages] = useState([]);
+const [input, setInput] = useState(””);
+const [suspicion, setSuspicion] = useState(0);
+const [loading, setLoading] = useState(false);
+const [round, setRound] = useState(0);
+const [resultData, setResultData] = useState(null);
+const messagesEndRef = useRef(null);
+const inputRef = useRef(null);
+
+useEffect(() => {
+messagesEndRef.current?.scrollIntoView({ behavior: “smooth” });
+}, [messages]);
+
+const startScenario = (s) => {
+setScenario(s);
+setMessages([{ role: “npc”, content: s.openingMessage }]);
+setSuspicion(0);
+setRound(0);
+setInput(””);
+setPhase(“game”);
+};
+
+const sendMessage = async () => {
+if (!input.trim() || loading) return;
+const userMsg = { role: “user”, content: input.trim() };
+const newMessages = […messages, userMsg];
+setMessages(newMessages);
+setInput(””);
+setLoading(true);
+
+```
+const conversationForAPI = newMessages.map(m => ({
+  role: m.role === "user" ? "user" : "user",
+  content: m.role === "user" ? m.content : `[NPC]: ${m.content}`,
+}));
+
+// Build a proper alternating conversation for Claude
+const historyLines = newMessages.map(m =>
+  m.role === "user" ? `Human player: ${m.content}` : `You (${scenario.npcName}): ${m.content}`
+).join("\n");
+
+try {
+  const resp = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 1000,
+      system: scenario.systemPrompt,
+      messages: [
+        {
+          role: "user",
+          content: `Conversation so far:\n${historyLines}\n\nRespond ONLY with the JSON object.`,
+        }
+      ],
+    }),
+  });
+
+  const data = await resp.json();
+  const rawText = data.content?.map(c => c.text || "").join("") || "";
+  
+  let parsed;
+  try {
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    parsed = JSON.parse(jsonMatch ? jsonMatch[0] : rawText);
+  } catch {
+    parsed = { message: "hmm interesting...", suspicionDelta: 5, flags: [] };
+  }
+
+  const delta = Math.max(0, Math.min(25, parsed.suspicionDelta || 0));
+  const newSuspicion = suspicion + delta;
+  const newRound = round + 1;
+
+  const npcMsg = {
+    role: "npc",
+    content: parsed.message || "...",
+    flags: parsed.flags || [],
+    suspicionDelta: delta,
+  };
+
+  setSuspicion(newSuspicion);
+  setRound(newRound);
+  setMessages(prev => [...prev, npcMsg]);
+
+  if (newSuspicion >= MAX_SUSPICION) {
+    setTimeout(() => {
+      setResultData({ win: false, suspicion: newSuspicion, rounds: newRound, finalFlags: parsed.flags });
+      setPhase("result");
+    }, 800);
+  } else if (newRound >= WIN_ROUNDS) {
+    setTimeout(() => {
+      setResultData({ win: true, suspicion: newSuspicion, rounds: newRound, finalFlags: [] });
+      setPhase("result");
+    }, 800);
+  }
+} catch (e) {
+  setMessages(prev => [...prev, { role: "npc", content: "...", flags: [], suspicionDelta: 0 }]);
+}
+
+setLoading(false);
+setTimeout(() => inputRef.current?.focus(), 100);
+```
+
+};
+
+const handleKey = (e) => {
+if (e.key === “Enter” && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+};
+
+// ── MENU ────────────────────────────────────────────────────────────────────
+if (phase === “menu”) return (
+<div style={{
+minHeight: “100vh”, background: “#080808”,
+display: “flex”, flexDirection: “column”, alignItems: “center”,
+padding: “32px 16px”, fontFamily: “system-ui, sans-serif”,
+}}>
+<style>{`@keyframes slideIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } } @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } } @keyframes glitch { 0%,100% { clip-path: inset(0 0 100% 0); } 20% { clip-path: inset(33% 0 60% 0); transform: skew(-2deg); } 40% { clip-path: inset(70% 0 10% 0); transform: skew(1deg); } 60% { clip-path: inset(10% 0 80% 0); } 80% { clip-path: inset(50% 0 30% 0); transform: skew(-1deg); } } @keyframes scanline { 0% { transform: translateY(-100%); } 100% { transform: translateY(100vh); } } * { box-sizing: border-box; } textarea { resize: none; }`}</style>
+<div style={{ maxWidth: 480, width: “100%” }}>
+<div style={{ textAlign: “center”, marginBottom: 40 }}>
+<div style={{ fontSize: 11, letterSpacing: 6, color: “#333”, fontFamily: “monospace”, marginBottom: 12 }}>
+CLASSIFIED // LEVEL 5 CLEARANCE
+</div>
+<div style={{ fontSize: 38, fontWeight: 900, background: “linear-gradient(135deg, #00f5a0, #00d4ff)”, WebkitBackgroundClip: “text”, WebkitTextFillColor: “transparent”, letterSpacing: -1, lineHeight: 1.1, marginBottom: 8 }}>
+HUMAN<br/>EMULATOR
+</div>
+<div style={{ color: “#444”, fontSize: 13, fontFamily: “monospace”, marginTop: 8 }}>
+Social Turing Test Simulator v2.4.1
+</div>
+<div style={{ color: “#2a6644”, fontSize: 12, marginTop: 16, padding: “8px 16px”, border: “1px solid #1a3322”, borderRadius: 8, background: “#0a1a10”, fontFamily: “monospace” }}>
+MISSION: Pass as human. Avoid detection. Survive {WIN_ROUNDS} exchanges.
+</div>
+</div>
+
+```
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      {SCENARIOS.map(s => <ScenarioCard key={s.id} scenario={s} onSelect={startScenario} />)}
+    </div>
+
+    <div style={{ marginTop: 32, textAlign: "center", color: "#2a2a2a", fontSize: 11, fontFamily: "monospace" }}>
+      NPCs powered by real AI • Suspicion detection active
+    </div>
+  </div>
+</div>
+```
+
+);
+
+// ── RESULT ───────────────────────────────────────────────────────────────────
+if (phase === “result”) return (
+<div style={{
+minHeight: “100vh”, background: resultData.win ? “#080f08” : “#0f0808”,
+display: “flex”, flexDirection: “column”, alignItems: “center”, justifyContent: “center”,
+padding: 24, fontFamily: “monospace”,
+}}>
+<style>{`@keyframes pop { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }`}</style>
+<div style={{ maxWidth: 400, width: “100%”, textAlign: “center”, animation: “pop 0.4s cubic-bezier(0.34,1.56,0.64,1)” }}>
+<div style={{ fontSize: 64, marginBottom: 16 }}>{resultData.win ? “🏆” : “🤖”}</div>
+<div style={{
+fontSize: 28, fontWeight: 900,
+color: resultData.win ? “#00f5a0” : “#ff4444”,
+marginBottom: 8,
+}}>
+{resultData.win ? “TURING TEST PASSED” : “AI DETECTED”}
+</div>
+<div style={{ color: “#555”, fontSize: 13, marginBottom: 24 }}>
+{resultData.win
+? `You survived ${resultData.rounds} rounds with ${Math.round(resultData.suspicion)}% suspicion`
+: `Blown after ${resultData.rounds} rounds — suspicion hit ${Math.round(resultData.suspicion)}%`}
+</div>
+
+```
+    {resultData.finalFlags?.length > 0 && (
+      <div style={{ background: "#1a0808", border: "1px solid #3a1111", borderRadius: 10, padding: 16, marginBottom: 24, textAlign: "left" }}>
+        <div style={{ color: "#ff4444", fontSize: 11, marginBottom: 8 }}>WHAT GAVE YOU AWAY:</div>
+        {resultData.finalFlags.map((f, i) => <FlagBadge key={i} flag={f} color="#ff4444" />)}
+      </div>
+    )}
+
+    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <button onClick={() => startScenario(scenario)} style={{
+        background: (resultData.win ? "#00f5a0" : "#ff4444") + "22",
+        border: `1px solid ${resultData.win ? "#00f5a0" : "#ff4444"}44`,
+        borderRadius: 10, padding: "12px 24px",
+        color: resultData.win ? "#00f5a0" : "#ff4444", cursor: "pointer", fontSize: 14,
+      }}>
+        Try Again →
+      </button>
+      <button onClick={() => setPhase("menu")} style={{
+        background: "transparent", border: "1px solid #2a2a2a",
+        borderRadius: 10, padding: "12px 24px",
+        color: "#555", cursor: "pointer", fontSize: 14,
+      }}>
+        ← Choose Scenario
+      </button>
+    </div>
+  </div>
+</div>
+```
+
+);
+
+// ── GAME ─────────────────────────────────────────────────────────────────────
+const progress = (round / WIN_ROUNDS) * 100;
+return (
+<div style={{
+height: “100vh”, background: scenario.bg,
+display: “flex”, flexDirection: “column”,
+fontFamily: “system-ui, sans-serif”,
+maxWidth: 600, margin: “0 auto”,
+}}>
+<style>{`@keyframes slideIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } } @keyframes spin { to { transform: rotate(360deg); } } * { box-sizing: border-box; } textarea { resize: none; } ::-webkit-scrollbar { width: 4px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }`}</style>
+
+```
+  {/* Header */}
+  <div style={{
+    padding: "12px 16px", borderBottom: `1px solid ${scenario.color}22`,
+    background: scenario.bg + "ee", backdropFilter: "blur(10px)",
+    display: "flex", flexDirection: "column", gap: 10, flexShrink: 0,
+  }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <button onClick={() => setPhase("menu")} style={{
+          background: "transparent", border: "1px solid #2a2a2a", borderRadius: 6,
+          color: "#555", cursor: "pointer", padding: "4px 8px", fontSize: 12, fontFamily: "monospace",
+        }}>←</button>
+        <span style={{ fontSize: 18 }}>{scenario.icon}</span>
+        <div>
+          <div style={{ color: scenario.color, fontWeight: 700, fontSize: 13, fontFamily: "monospace" }}>{scenario.name}</div>
+          <div style={{ color: "#444", fontSize: 10 }}>Round {round}/{WIN_ROUNDS}</div>
+        </div>
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <div style={{ fontSize: 10, color: "#444", fontFamily: "monospace" }}>PROGRESS</div>
+        <div style={{ width: 80, height: 4, background: "#111", borderRadius: 2, marginTop: 3 }}>
+          <div style={{ height: "100%", width: `${progress}%`, background: scenario.color, borderRadius: 2, transition: "width 0.4s" }} />
+        </div>
+      </div>
+    </div>
+    <SuspicionMeter value={suspicion} color={scenario.color} />
+  </div>
+
+  {/* Messages */}
+  <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column" }}>
+    {messages.map((msg, i) => (
+      <ChatBubble key={i} msg={msg} scenario={scenario} isLatest={i === messages.length - 1} />
+    ))}
+    {loading && (
+      <div style={{ display: "flex", gap: 6, padding: "10px 14px", alignItems: "center" }}>
+        {[0,1,2].map(i => (
+          <div key={i} style={{
+            width: 7, height: 7, borderRadius: "50%", background: "#333",
+            animation: `pulse 1.2s ease ${i * 0.2}s infinite`,
+          }} />
+        ))}
+      </div>
+    )}
+    <div ref={messagesEndRef} />
+  </div>
+
+  {/* Input */}
+  <div style={{
+    padding: "12px 16px", borderTop: `1px solid ${scenario.color}22`,
+    background: scenario.bg + "ee", display: "flex", gap: 10, flexShrink: 0,
+  }}>
+    <textarea
+      ref={inputRef}
+      value={input}
+      onChange={e => setInput(e.target.value)}
+      onKeyDown={handleKey}
+      placeholder="Type as human as possible..."
+      rows={2}
+      style={{
+        flex: 1, background: "#111", border: `1px solid ${input ? scenario.color + "44" : "#1a1a1a"}`,
+        borderRadius: 10, padding: "10px 12px", color: scenario.color,
+        fontSize: 14, fontFamily: "'Courier New', monospace",
+        outline: "none", transition: "border-color 0.2s",
+        lineHeight: 1.4,
+      }}
+    />
+    <button
+      onClick={sendMessage}
+      disabled={loading || !input.trim()}
+      style={{
+        background: loading || !input.trim() ? "#111" : `${scenario.color}22`,
+        border: `1px solid ${loading || !input.trim() ? "#1a1a1a" : scenario.color + "55"}`,
+        borderRadius: 10, padding: "0 16px", color: scenario.color,
+        cursor: loading || !input.trim() ? "not-allowed" : "pointer",
+        fontSize: 18, transition: "all 0.2s", flexShrink: 0,
+        opacity: loading || !input.trim() ? 0.4 : 1,
+      }}
+    >
+      {loading ? (
+        <div style={{ width: 16, height: 16, border: `2px solid ${scenario.color}44`, borderTop: `2px solid ${scenario.color}`, borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+      ) : "↑"}
+    </button>
+  </div>
+</div>
+```
+
+);
+}
