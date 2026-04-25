@@ -4,7 +4,7 @@
 <link rel="icon" href="favicon.png" type="image/png">
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Voxify</title>
+<title>VoxTek</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" />
 
@@ -16,6 +16,8 @@
     --glass-border: rgba(255, 255, 255, 0.1);
     --text-main: #ffffff;
     --text-muted: #a1a1a6;
+    --warning: #ffd60a;
+    --warning-glow: rgba(255, 214, 10, 0.35);
   }
 
   * { box-sizing: border-box; }
@@ -28,6 +30,10 @@
     min-height: 100vh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   body::before {
@@ -62,263 +68,238 @@
   .logo { font-weight: 800; font-size: 28px; letter-spacing: -1px; }
   .logo span { color: var(--accent); }
 
-  .search-wrap { position: relative; width: 100%; max-width: 400px; }
-  
-  .search {
-    width: 100%;
-    padding: 12px 20px;
-    border-radius: 14px;
-    border: 1px solid var(--glass-border);
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(15px);
-    color: #fff;
-    font-size: 16px;
-    outline: none;
-    transition: all 0.3s ease;
-  }
-  .search:focus {
-    background: rgba(255, 255, 255, 0.18);
-    border-color: var(--accent);
-    box-shadow: 0 0 20px var(--accent-glow);
-  }
-
-  main { padding-top: 120px; padding-bottom: 160px; max-width: 1600px; margin: 0 auto; }
-  .section-title { padding: 0 50px; font-size: 24px; font-weight: 700; margin-bottom: 25px; }
-
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 30px;
-    padding: 0 50px;
-  }
-
-  .card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    border-radius: 24px;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    position: relative;
-  }
-  .card:hover { transform: scale(1.05); border-color: rgba(255,255,255,0.3); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-
-  .thumb { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
-  .metaRow { padding: 18px; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); position: absolute; bottom: 0; width: 100%; }
-  .title { font-weight: 700; font-size: 17px; margin-bottom: 4px; }
-  .artist { color: var(--text-muted); font-size: 13px; }
-
-  .player-bar {
-    position: fixed;
-    bottom: 25px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 92%;
-    max-width: 1100px;
-    height: 100px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(30px) saturate(180%);
-    border: 1px solid var(--glass-border);
-    border-radius: 30px;
+  /* ── Construction Card ── */
+  .notice-wrap {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    padding: 0 30px;
-    z-index: 1000;
+    text-align: center;
+    padding: 20px;
+    max-width: 680px;
+    width: 100%;
+    animation: fadeUp 0.7s cubic-bezier(0.165, 0.84, 0.44, 1) both;
   }
 
-  .player-left { display: flex; align-items: center; gap: 15px; width: 30%; }
-  .player-left img { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; }
-
-  .player-center { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .controls { display: flex; align-items: center; gap: 20px; }
-  .control-btn {
-    background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; transition: all 0.2s;
-  }
-  .control-btn.active { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
-  
-  .play-btn {
-    width: 45px; height: 45px; background: #fff; color: #000; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center; font-size: 20px;
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 
-  .progress-container { width: 100%; display: flex; align-items: center; gap: 12px; }
-  .progress { flex: 1; height: 6px; background: rgba(255,255,255,0.15); border-radius: 10px; cursor: pointer; position: relative; }
-  .filled { height: 100%; background: #fff; width: 0%; border-radius: 10px; }
+  /* Striped construction banner */
+  .construction-banner {
+    width: 100%;
+    height: 18px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--warning) 0px,
+      var(--warning) 18px,
+      #1a1a1a 18px,
+      #1a1a1a 36px
+    );
+    border-radius: 14px 14px 0 0;
+    flex-shrink: 0;
+  }
 
-  .player-right { width: 30%; display: flex; justify-content: flex-end; align-items: center; gap: 15px; }
-  .volume-slider { -webkit-appearance: none; width: 100px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; }
-  .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; background: #fff; border-radius: 50%; }
+  .notice-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-top: none;
+    border-radius: 0 0 28px 28px;
+    padding: 44px 48px 48px;
+    backdrop-filter: blur(30px) saturate(180%);
+    width: 100%;
+  }
 
-  @media (max-width: 900px) { .player-left, .player-right { display: none; } }
+  .cone-row {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .cone-row i {
+    font-size: 42px;
+    color: var(--warning);
+    filter: drop-shadow(0 0 14px var(--warning-glow));
+    animation: bob 2.4s ease-in-out infinite;
+  }
+  .cone-row i:nth-child(2) { animation-delay: 0.4s; }
+  .cone-row i:nth-child(3) { animation-delay: 0.8s; }
+
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-6px); }
+  }
+
+  .notice-title {
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    color: var(--text-main);
+  }
+
+  .notice-title .highlight {
+    color: var(--warning);
+    text-shadow: 0 0 20px var(--warning-glow);
+  }
+
+  .notice-subtitle {
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 36px;
+    max-width: 480px;
+  }
+
+  .divider {
+    width: 60px;
+    height: 2px;
+    background: var(--glass-border);
+    margin: 0 auto 36px;
+    border-radius: 2px;
+  }
+
+  /* Message pill */
+  .info-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 214, 10, 0.1);
+    border: 1px solid rgba(255, 214, 10, 0.25);
+    border-radius: 50px;
+    padding: 10px 20px;
+    font-size: 14px;
+    color: var(--warning);
+    font-weight: 600;
+    margin-bottom: 36px;
+    letter-spacing: 0.01em;
+  }
+  .info-pill i { font-size: 15px; }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    border: none;
+    letter-spacing: 0.01em;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 24px var(--accent-glow);
+  }
+  .btn-primary:hover {
+    background: #3a9eff;
+    transform: scale(1.04);
+    box-shadow: 0 0 36px var(--accent-glow);
+  }
+
+  .btn-ghost {
+    background: rgba(255,255,255,0.08);
+    color: var(--text-main);
+    border: 1px solid var(--glass-border);
+  }
+  .btn-ghost:hover {
+    background: rgba(255,255,255,0.14);
+    transform: scale(1.04);
+    border-color: rgba(255,255,255,0.25);
+  }
+
+  .tagline {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-top: 20px;
+    letter-spacing: 0.01em;
+    opacity: 0.7;
+  }
+
+  /* Bottom stripe */
+  .construction-banner-bottom {
+    width: 100%;
+    height: 8px;
+    background: repeating-linear-gradient(
+      -45deg,
+      var(--warning) 0px,
+      var(--warning) 10px,
+      #1a1a1a 10px,
+      #1a1a1a 20px
+    );
+    border-radius: 0 0 0 0;
+    margin-top: 10px;
+    opacity: 0.4;
+    border-radius: 50px;
+  }
+
+  @media (max-width: 600px) {
+    .notice-card { padding: 32px 24px 36px; }
+    .btn { padding: 13px 22px; font-size: 14px; }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">Vox<span>ify</span></div>
-  <div class="search-wrap">
-    <input id="searchInput" class="search" type="search" placeholder="Search tracks...">
-  </div>
+  <div class="logo">Vox<span>Tek</span></div>
 </header>
 
-<main>
-  <div class="section-title">Hell's Most Popular Music App — Trust Us With Your Eardrums</div>
-  <div id="grid" class="grid"></div>
-</main>
+<div class="notice-wrap">
+  <div class="construction-banner"></div>
 
-<div class="player-bar">
-  <div class="player-left">
-    <img id="pb-art" src="https://i.imgur.com/uTp5NJw.png" alt="art">
-    <div class="player-info">
-      <div id="pb-title" class="title" style="margin:0; font-size:15px">Not playing</div>
-      <div id="pb-sub" class="artist">—</div>
+  <div class="notice-card">
+
+    <div class="cone-row">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <i class="fa-solid fa-triangle-exclamation"></i>
     </div>
+
+    <div class="notice-title">
+      Voxify is no longer displaying<br>
+      <span class="highlight">VoxTek Music</span>
+    </div>
+
+    <p class="notice-subtitle">
+      This page has been retired. You can now listen to all songs alongside their official music videos over on VoxTek Video.
+    </p>
+
+    <div class="divider"></div>
+
+    <div class="info-pill">
+      <i class="fa-solid fa-film"></i>
+      Watch & listen on VoxTek Video
+    </div>
+
+    <div class="btn-row">
+      <a href="https://blues-voxtek.github.io" class="btn btn-primary">
+        <i class="fa-solid fa-house"></i>
+        Back to VoxTek
+      </a>
+    </div>
+
   </div>
 
-  <div class="player-center">
-    <div class="controls">
-      <button id="shuffleBtn" class="control-btn" title="Shuffle"><i class="fa-solid fa-shuffle"></i></button>
-      <button id="prevBtn" class="control-btn"><i class="fa-solid fa-backward-step"></i></button>
-      <button id="playBtn" class="control-btn play-btn"><i class="fa-solid fa-play"></i></button>
-      <button id="nextBtn" class="control-btn"><i class="fa-solid fa-forward-step"></i></button>
-      <button id="repeatBtn" class="control-btn" title="Repeat"><i class="fa-solid fa-repeat"></i></button>
-    </div>
-    <div class="progress-container">
-      <span id="curTime" style="font-size:11px; opacity:0.6">0:00</span>
-      <div class="progress" id="progress"><div class="filled" id="progressFilled"></div></div>
-      <span id="durTime" style="font-size:11px; opacity:0.6">0:00</span>
-    </div>
-  </div>
+  <div class="construction-banner-bottom"></div>
 
-  <div class="player-right">
-    <i id="muteBtn" class="fa-solid fa-volume-high" style="cursor:pointer"></i>
-    <input id="volRange" class="volume-slider" type="range" min="0" max="1" step="0.01" value="1">
-  </div>
+  <p class="tagline">Hell's Most Popular Music App — Trust Us With Your Eardrums</p>
 </div>
 
-<script>
-const AUDIO_BASE = "https://blues-voxtek.github.io/";
-
-const songs = [
-  { title: "Don't You Forget (Reprise)", artist: "EinfachBlue, Sir Masky", cover: "https://i.imgur.com/RtOJjKi.png", audio: AUDIO_BASE + 'reprise.mp3' },
-  { title: "VOX DEI", artist: "EinfachBlue", cover: "https://i.imgur.com/0lxcvwM.png", audio: AUDIO_BASE + 'voxdei.mp3' },
-  { title: "VOX POPULI", artist: "EinfachBlue, Sir Masky", cover: "https://i.imgur.com/HmA3pTy.png", audio: AUDIO_BASE + 'populi.mp3' },
-  { title: "Brighter", artist: "EinfachBlue", cover: "https://i.imgur.com/GqToIsR.png", audio: AUDIO_BASE + 'brighter2.mp3' },
-  { title: "Loser, Baby", artist: "Sir Masky, EinfachBlue", cover: "https://i.imgur.com/zjQPQZn.png", audio: AUDIO_BASE + 'loserbaby.mp3' },
-  { title: "Stayed Gone", artist: "EinfachBlue, Sir Masky", cover: "https://i.imgur.com/89Vu47n.png", audio: AUDIO_BASE + 'stayed_gone.mp3' },
-  { title: "Don't You Forget", artist: "EinfachBlue, Sir Masky", cover: "https://i.imgur.com/96deT6E.png", audio: AUDIO_BASE + 'dont_you_forget.mp3' },
-  { title: "Clean It Up", artist: "Sir Masky", cover: "https://i.imgur.com/xDu4aJy.png", audio: AUDIO_BASE + 'clean_it_up.mp3' },
-  { title: "Hell's Greatest Dad", artist: "Sir Masky, EinfachBlue", cover: "https://i.imgur.com/ogDud2g.png", audio: AUDIO_BASE + 'hells_greatest_dad.mp3' },
-  { title: "Once We Get Up There", artist: "Sir Masky, EinfachBlue", cover: "https://i.imgur.com/z9xBLvt.png", audio: AUDIO_BASE + 'once_we_get_up_there.mp3' },
-];
-
-const grid = document.getElementById('grid');
-const audio = new Audio();
-let currentIndex = 0;
-let isShuffle = false;
-let isRepeat = false;
-
-// Search Functionality
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  const query = e.target.value.toLowerCase();
-  const filtered = songs.map((s, i) => ({...s, originalIndex: i}))
-                        .filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
-  render(filtered);
-});
-
-function render(data = songs) {
-  grid.innerHTML = data.map((s) => {
-    // We use originalIndex if filtered, otherwise the map index
-    const playIdx = s.hasOwnProperty('originalIndex') ? s.originalIndex : songs.indexOf(s);
-    return `
-      <div class="card" onclick="playIndex(${playIdx})">
-        <img src="${s.cover}" class="thumb">
-        <div class="metaRow">
-          <div class="title">${s.title}</div>
-          <div class="artist">${s.artist}</div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
-
-function playIndex(i) {
-  currentIndex = i;
-  const s = songs[i];
-  audio.src = s.audio;
-  document.getElementById('pb-art').src = s.cover;
-  document.getElementById('pb-title').textContent = s.title;
-  document.getElementById('pb-sub').textContent = s.artist;
-  audio.play();
-}
-
-// Shuffle & Repeat Toggles
-document.getElementById('shuffleBtn').onclick = function() {
-  isShuffle = !isShuffle;
-  this.classList.toggle('active', isShuffle);
-};
-
-document.getElementById('repeatBtn').onclick = function() {
-  isRepeat = !isRepeat;
-  this.classList.toggle('active', isRepeat);
-};
-
-// Playback Logic
-document.getElementById('playBtn').onclick = () => audio.paused ? audio.play() : audio.pause();
-
-document.getElementById('nextBtn').onclick = playNext;
-document.getElementById('prevBtn').onclick = () => {
-  if(audio.currentTime > 3) { audio.currentTime = 0; }
-  else {
-    currentIndex = (currentIndex - 1 + songs.length) % songs.length;
-    playIndex(currentIndex);
-  }
-};
-
-function playNext() {
-  if (isShuffle) {
-    currentIndex = Math.floor(Math.random() * songs.length);
-  } else {
-    currentIndex = (currentIndex + 1) % songs.length;
-  }
-  playIndex(currentIndex);
-}
-
-audio.onended = () => {
-  if (isRepeat) { audio.play(); } 
-  else { playNext(); }
-};
-
-// UI Updates
-audio.onplay = () => document.getElementById('playBtn').innerHTML = '<i class="fa-solid fa-pause"></i>';
-audio.onpause = () => document.getElementById('playBtn').innerHTML = '<i class="fa-solid fa-play"></i>';
-
-audio.ontimeupdate = () => {
-  const pct = (audio.currentTime / audio.duration) * 100;
-  document.getElementById('progressFilled').style.width = pct + '%';
-  document.getElementById('curTime').textContent = formatTime(audio.currentTime);
-};
-
-audio.onloadedmetadata = () => document.getElementById('durTime').textContent = formatTime(audio.duration);
-
-function formatTime(s) {
-  if(!s) return "0:00";
-  const m = Math.floor(s/60);
-  const sec = Math.floor(s%60).toString().padStart(2,'0');
-  return `${m}:${sec}`;
-}
-
-document.getElementById('progress').onclick = (e) => {
-  const rect = e.currentTarget.getBoundingClientRect();
-  audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-};
-
-document.getElementById('volRange').oninput = (e) => audio.volume = e.target.value;
-
-render();
-</script>
 </body>
 </html>
-
-
-
